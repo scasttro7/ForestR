@@ -3,7 +3,7 @@
 
 ```
 ForestR v0.1-alpha · BIODATUM / PPGCASA / UFAM · 2026
-Sabrina Castro da Silva · Laboratório de Manejo Florestal (LMF) / INPA
+Sabrina Castro
 ```
 
 ---
