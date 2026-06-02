@@ -241,7 +241,7 @@ O arquivo **`public/forestr-biodatum.html`** contém um levantamento técnico co
 **R:** O padrão é otimizado para Amazônia Central, mas as equações de Chave et al. (2014) permitem comparação pantropical. Para Congo e Sudeste Asiático, use as equações regionais referenciadas na documentação.
 
 ### P: Como contribuir para o desenvolvimento?
-**R:** ContacteSabrina Castro da Silva (ppgcasa@ufam.edu.br) ou o LMF/INPA.
+**R:** ContacteSabrina Castro da Silva (sabrinacastroadm1@gmail.com) 
 
 ### P: Há limitações nas equações?
 **R:** 
@@ -253,12 +253,11 @@ O arquivo **`public/forestr-biodatum.html`** contém um levantamento técnico co
 
 ## Contactos
 
-**Autora:** Sabrina Castro da Silva  
-**Email:** sabrina.castro@ufam.edu.br  
+**Autora:** Sabrina Castro 
+**Email:** sabrina.castro@ufam.edu.br  ou sabrinacastroadm1@gmail.com
 **Afiliação:** PPGCASA / UFAM · Manaus, AM  
 **Laboratório:** Laboratório de Manejo Florestal (LMF) · INPA  
 
-**Co-orientação científica:** Prof.ª Dr.ª Aurora Miho Yanai (UFAM)
 
 ---
 
