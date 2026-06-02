@@ -256,7 +256,7 @@ O arquivo **`public/forestr-biodatum.html`** contém um levantamento técnico co
 **Autora:** Sabrina Castro 
 **Email:** sabrina.castro@ufam.edu.br  ou sabrinacastroadm1@gmail.com
 **Afiliação:** PPGCASA / UFAM · Manaus, AM  
-**Laboratório:** Laboratório de Manejo Florestal (LMF) · INPA  
+
 
 
 ---
