@@ -1,4 +1,9 @@
 # ForestR
+[
+
+![DOI](https://zenodo.org/badge/1246127797.svg)
+
+](https://doi.org/10.5281/zenodo.20751542)
 
 Pacote em R para o subsistema biofísico do framework **BIODATUM** — cálculo de biomassa, carbono e do Índice de Resiliência Florestal Amazônica (IRFA), com equações verificadas contra fonte primária.
 
