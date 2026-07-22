@@ -1,6 +1,6 @@
 # ══════════════════════════════════════════════════════════════════
 #  ForestR — Análise de Florestas Tropicais
-#  Protocolo Higuchi · LMF/INPA · BIODATUM v0.8
+#  BIODATUM v0.8
 #  Autora: Sabrina Castro da Silva · PPGCASA/UFAM · 2026
 #
 #  ARQUITETURA EM TRÊS NÍVEIS (Seção 3.6 da tese):
