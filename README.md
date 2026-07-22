@@ -57,6 +57,26 @@ Equações alométricas de **Higuchi et al. (1998)**, *Acta Amazonica* 28(2):153
 
 **Correção crítica documentada:** versões anteriores calculavam carbono aplicando um fator direto sobre o peso fresco, o que superestima o carbono em cerca de 62–66% (ver changelog completo em `ForestR_v0.8.R`, cabeçalho). A cadeia correta é fresco → seco (×0,6028) → carbono (×0,48), confirmada por três fontes independentes do LMF/INPA: Higuchi et al. (1998), Silva (2007) e Higuchi et al. (2004).
 
+### Catálogo de equações alométricas — `equacoes_alometricas()` / `biomassa_alometrica()`
+
+O ForestR mantém um catálogo de 19 equações alométricas de biomassa, cobrindo Amazônia, Bacia do Congo, Sudeste Asiático e pantropical — usado para comparação e validação cruzada, nunca como default silencioso.
+
+```r
+equacoes_alometricas()          # lista as 19 equações, com fórmula, região e unidade de saída
+biomassa_alometrica(dap = 30, equacao = "chave_2005", wd = 0.65)  # calcula com uma equação específica
+```
+
+| Região | Equações no catálogo |
+|---|---|
+| Amazônia | Higuchi et al. (1998) — 3 variantes; Chambers et al. (2001); Nogueira et al. (2008); Baia et al. (2025, modelo H-D) |
+| Bacia do Congo | Djomo et al. (2010); Fayolle et al. (2013, 2018, 2024); Ngomanda et al. (2014); Brown et al. (1997, FAO); Komiyama et al. (2008) |
+| Sudeste Asiático | Basuki et al. (2009); Kenzo et al. (2009); Rutishauser et al. (2013, modelo H-D) |
+| Pantropical | Chave et al. (2005, 2014 — modelos I e II) |
+
+**Status de verificação — importante:** apenas as equações de **Higuchi et al. (1998)** foram conferidas diretamente contra o artigo original (Considerações Finais, item 3). As demais 16 equações do catálogo **não foram verificadas individualmente** contra suas fontes primárias — foram digitadas a partir de nota técnica de referência e ainda precisam de conferência, uma a uma, antes de qualquer uso em publicação. Duas delas (`baia_2025_hd`, `rutishauser_2013_hd`) são modelos altura-diâmetro, não de biomassa — chamá-las por `biomassa_alometrica()` retorna erro deliberado, não um número.
+
+Trate o catálogo como ponto de partida para comparação, não como equações prontas para citar sem checagem.
+
 ### Exemplo
 
 ```r
