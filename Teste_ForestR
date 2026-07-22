@@ -1,0 +1,162 @@
+# ══════════════════════════════════════════════════════════════════
+#  test-ForestR.R — testes automatizados (testthat) para ForestR v0.5
+#
+#  Cobre exatamente as equações que já tiveram erro real nesta sessão
+#  de trabalho: coeficientes de Higuchi trocados (v0.1 -> v0.2), cadeia
+#  fresco->seco->carbono superestimando 66% (v0.2 -> v0.3), fator de
+#  correção por altura dominante (v0.4 -> v0.5). Se qualquer equação
+#  for alterada no futuro sem querer, estes testes acusam na hora.
+#
+#  Como rodar: testthat::test_file("test-ForestR.R"), depois de
+#  carregar ForestR_v0.5.R com source().
+# ══════════════════════════════════════════════════════════════════
+
+library(testthat)
+# source("ForestR_v0.5.R")  # descomente e ajuste o caminho ao rodar
+
+# ── 1. biomassa_higuchi() — coeficientes corretos de Higuchi et al. (1998) ──
+
+test_that("biomassa_higuchi usa os coeficientes corretos do artigo (não os da nota técnica errada)", {
+  # Considerações Finais, item 3, Modelo 1:
+  #   ln P = -1,754 + 2,665 ln D ; 5<=DAP<20   -> P = exp(-1,754)*D^2,665
+  #   ln P = -0,151 + 2,170 ln D ; DAP>=20     -> P = exp(-0,151)*D^2,170
+  esperado_10 <- exp(-1.754 + 2.665 * log(10))
+  esperado_30 <- exp(-0.151 + 2.170 * log(30))
+  expect_equal(biomassa_higuchi(10), esperado_10, tolerance = 1e-6)
+  expect_equal(biomassa_higuchi(30), esperado_30, tolerance = 1e-6)
+})
+
+test_that("biomassa_higuchi NÃO reproduz os coeficientes errados da nota técnica (0,0576 / 0,1281)", {
+  errado_10 <- 0.0576 * 10^2.665
+  errado_30 <- 0.1281 * 30^2.170
+  expect_false(isTRUE(all.equal(biomassa_higuchi(10), errado_10, tolerance = 0.01)))
+  expect_false(isTRUE(all.equal(biomassa_higuchi(30), errado_30, tolerance = 0.01)))
+})
+
+test_that("biomassa_higuchi seleciona a equação certa por classe de DAP", {
+  # abaixo de 20cm usa a equação (a); 20cm ou mais usa a equação (b)
+  expect_equal(biomassa_higuchi(19.9), exp(-1.754 + 2.665 * log(19.9)), tolerance = 1e-6)
+  expect_equal(biomassa_higuchi(20.0), exp(-0.151 + 2.170 * log(20.0)), tolerance = 1e-6)
+})
+
+test_that("biomassa_higuchi rejeita DAP <= 0", {
+  expect_error(biomassa_higuchi(0))
+  expect_error(biomassa_higuchi(-5))
+})
+
+# ── 2. Cadeia fresco -> seco -> carbono — corrige a superestimação de 66% ──
+
+test_that("converter_fresco_seco aplica o fator correto (Tabela 3b, Higuchi et al. 1998)", {
+  expect_equal(converter_fresco_seco(100), 60.28, tolerance = 1e-6)
+})
+
+test_that("carbono_de_seco aplica o teor de carbono correto (48%)", {
+  expect_equal(carbono_de_seco(100), 48, tolerance = 1e-6)
+})
+
+test_that("carbono_higuchi aplica a cadeia completa e NÃO superestima em 1,66x", {
+  dap <- 30
+  pf <- biomassa_higuchi(dap)
+  c_correto <- pf * 0.6028 * 0.48
+  c_errado_direto <- pf * 0.47  # erro da v0.1/v0.2: carbono direto sobre peso fresco
+  expect_equal(carbono_higuchi(dap), c_correto, tolerance = 1e-6)
+  # a razão carbono/fresco deve ser ~0,289, nunca ~0,47
+  razao <- carbono_higuchi(dap) / pf
+  expect_equal(razao, 0.6028 * 0.48, tolerance = 1e-6)
+  expect_false(isTRUE(all.equal(carbono_higuchi(dap), c_errado_direto, tolerance = 0.05)))
+})
+
+test_that("a razão carbono/peso-fresco é constante em toda a faixa de DAP", {
+  razoes <- sapply(c(10, 20, 30, 50, 80), function(d) carbono_higuchi(d) / biomassa_higuchi(d))
+  expect_true(all(abs(razoes - razoes[1]) < 1e-9))
+})
+
+# ── 3. Sanidade numérica geral ──────────────────────────────────────
+
+test_that("biomassa_higuchi é sempre positiva e cresce com o DAP", {
+  daps <- c(5, 10, 20, 30, 50, 80, 120)
+  valores <- sapply(daps, biomassa_higuchi)
+  expect_true(all(valores > 0))
+  expect_true(all(diff(valores) > 0))
+})
+
+test_that("area_basal bate com a fórmula pi*(DAP/200)^2", {
+  expect_equal(area_basal(20), pi * (20/200)^2, tolerance = 1e-9)
+})
+
+# ── 4. IRFA — média não ponderada e classificação fuzzy ─────────────
+
+test_that("calcular_irfa usa média NÃO ponderada por default", {
+  r <- calcular_irfa(B = 1, C = 1, E = 1, R = 1, P = 0)
+  expect_equal(r$irfa, 1, tolerance = 1e-9)
+  r2 <- calcular_irfa(B = 0, C = 0, E = 0, R = 0, P = 1)
+  expect_equal(r2$irfa, 0, tolerance = 1e-9)
+})
+
+test_that("calcular_irfa trata P como complemento (1-P), não como termo direto", {
+  # aumentar P deve DIMINUIR o irfa, não aumentar
+  r_baixo_p <- calcular_irfa(B = 0.7, C = 0.7, E = 0.7, R = 0.7, P = 0.1)
+  r_alto_p  <- calcular_irfa(B = 0.7, C = 0.7, E = 0.7, R = 0.7, P = 0.9)
+  expect_true(r_baixo_p$irfa > r_alto_p$irfa)
+})
+
+test_that("classificar_fuzzy usa os cinco níveis e limiares corretos (Seção 3.3 da tese)", {
+  expect_equal(classificar_fuzzy(0.10), "Muito baixo")
+  expect_equal(classificar_fuzzy(0.20), "Muito baixo")
+  expect_equal(classificar_fuzzy(0.30), "Baixo")
+  expect_equal(classificar_fuzzy(0.50), "Moderado")
+  expect_equal(classificar_fuzzy(0.70), "Alto")
+  expect_equal(classificar_fuzzy(0.90), "Muito alto")
+})
+
+test_that("calcular_irfa aceita pesos alternativos para análise de sensibilidade sem alterar o default", {
+  r_default <- calcular_irfa(B = 0.7, C = 0.6, E = 0.8, R = 0.5, P = 0.1)
+  r_pesado  <- calcular_irfa(B = 0.7, C = 0.6, E = 0.8, R = 0.5, P = 0.1,
+                             pesos = c(B = 0.4, C = 0.1, E = 0.2, R = 0.2, P = 0.1))
+  expect_false(isTRUE(all.equal(r_default$irfa, r_pesado$irfa)))
+  expect_match(r_default$modo, "default", fixed = TRUE)
+})
+
+# ── 5. Fator de correção por altura dominante (v0.5) ────────────────
+
+test_that("fator_correcao_altura_dominante usa o default confirmado (30,2 m, Higuchi F.G. 2015)", {
+  expect_equal(fator_correcao_altura_dominante(30.2), 1, tolerance = 1e-9)
+  expect_equal(formals(fator_correcao_altura_dominante)$h_dom_calibracao, 30.2)
+})
+
+test_that("fator_correcao_altura_dominante rejeita calibração <= 0", {
+  expect_error(fator_correcao_altura_dominante(20, h_dom_calibracao = 0))
+})
+
+test_that("biomassa_higuchi_corrigida aplica o fator corretamente sobre biomassa_higuchi", {
+  dap <- 30; h_sitio <- 21.3
+  esperado <- biomassa_higuchi(dap) * (h_sitio / 30.2)
+  expect_equal(biomassa_higuchi_corrigida(dap, h_sitio), esperado, tolerance = 1e-9)
+})
+
+# ── 6. classificar_padrao_dse() — Quadro 7, quatro padrões descritivos ──
+
+test_that("classificar_padrao_dse reproduz os quatro padrões do Quadro 7", {
+  expect_match(classificar_padrao_dse(0.75, 0.72)$padrao, "^A")
+  expect_match(classificar_padrao_dse(0.72, 0.18)$padrao, "^B")
+  expect_match(classificar_padrao_dse(0.15, 0.12)$padrao, "^C")
+  expect_match(classificar_padrao_dse(0.18, 0.78)$padrao, "^D")
+})
+
+test_that("classificar_padrao_dse retorna Indeterminado quando IRFA ou IPTA está em Moderado", {
+  expect_match(classificar_padrao_dse(0.50, 0.65)$padrao, "Indeterminado")
+  expect_match(classificar_padrao_dse(0.65, 0.50)$padrao, "Indeterminado")
+})
+
+test_that("classificar_padrao_dse calcula DSE e ICS corretamente", {
+  r <- classificar_padrao_dse(0.75, 0.72)
+  expect_equal(r$dse, 0.75 - 0.72, tolerance = 1e-9)
+  expect_equal(r$ics, 1 - abs(0.75 - 0.72), tolerance = 1e-9)
+})
+
+test_that("classificar_padrao_dse rejeita valores fora de 0-1", {
+  expect_error(classificar_padrao_dse(1.2, 0.5))
+  expect_error(classificar_padrao_dse(0.5, -0.1))
+})
+
+# ── Fim ──────────────────────────────────────────────────────────────
