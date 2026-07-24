@@ -1,0 +1,24 @@
+Package: ForestR
+Type: Package
+Title: Analise Alometrica, IRFA e Inventario Florestal para Florestas Tropicais
+Version: 0.8.0
+Authors@R: person("Sabrina", "Castro da Silva", email = "sabrina.castro@example.com", role = c("aut", "cre"))
+Description: Equacoes alometricas tropicais (Amazonia, Bacia do Congo, Sudeste
+    Asiatico, Pantropical), cadeia fresco->seco->carbono validada contra
+    Higuchi et al. (1998), fator de correcao por altura dominante (protocolo
+    CADAF/LMF-INPA), o Indice de Resiliencia Florestal Amazonica (IRFA) e os
+    quatro padroes da triangulacao IRFA-IPTA do arcabouco BIODATUM, alem de
+    ferramentas de inventario florestal, diversidade alfa e visualizacoes
+    tematicas em ggplot2.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a license
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Depends: R (>= 4.1.0)
+Imports:
+    ggplot2,
+    scales
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
