@@ -1,0 +1,28 @@
+citHeader("Para citar o pacote ForestR, utilize:")
+
+bibentry(
+  bibtype  = "Manual",
+  title    = "ForestR: Analise Alometrica, IRFA e Inventario Florestal para Florestas Tropicais",
+  author   = person("Sabrina", "Castro da Silva"),
+  year     = "2026",
+  note     = "R package version 0.8.0",
+  url      = "https://github.com/scasttro7/ForestR"
+)
+
+citFooter(
+  "Este pacote implementa metodologia validada contra as fontes primarias",
+  "abaixo. Ao usar funcoes especificas, cite tambem a fonte correspondente",
+  "(ver equacoes_alometricas() para o catalogo completo):",
+  "",
+  "  Higuchi, N. et al. (1998). Biomassa da parte aerea da vegetacao da",
+  "  floresta tropical umida de terra-firme da Amazonia brasileira.",
+  "  Acta Amazonica, 28(2), 153-166.",
+  "",
+  "  Higuchi, F.G. (2015). Dinamica de volume e biomassa da floresta de",
+  "  terra firme do Amazonas. Tese de Doutorado, UFPR, Curitiba.",
+  "  [fator de correcao por altura dominante, protocolo CADAF/LMF-INPA]",
+  "",
+  "Para o IRFA (Indice de Resiliencia Florestal Amazonica) e os padroes da",
+  "triangulacao IRFA-IPTA, cite tambem a tese BIODATUM (Castro da Silva,",
+  "PPGCASA/UFAM, em desenvolvimento)."
+)
